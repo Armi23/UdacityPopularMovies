@@ -3,12 +3,18 @@ package com.armi.popularmovies;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.GridView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,54 +22,99 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MovieGridFragment extends Fragment {
 
     /**
-     * TMDB API base URL
+     * Base ranking URL for TMDB
      */
-    public static final String BASE_MOVIE_API_URL = "http://image.tmdb.org/t/p/";
-
-    public static final String POPULAR_MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie/popular";
+    public static final String MOVIES_RANKING_BASE_URL = "http://api.themoviedb.org/3";
 
     /**
-     * Default recommended phone size
+     * URL addition needed to get popular movies
      */
-    public static final String DEFAULT_IMAGE_SIZE = "w185";
+    public static final String POPULAR_MOVIES_RANKING = "/movie/popular";
+
+
+    /**
+     * URL addition needed to get top rated movies
+     */
+    public static final String TOP_RATED_RANKING = "/movie/top_rated";
 
     /**
      * Used to set API KEY query parameter
      */
     public static final String API_KEY = "api_key";
 
-    TextView textView;
+    /**
+     * GridView to display movies
+     */
+    private GridView gridView;
+
+    /**
+     * Adapter that coordinates with grid view to display movies
+     */
+    private MovieDataAdapter movieDataAdapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        movieDataAdapter = new MovieDataAdapter();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
-        textView = (TextView) rootView.findViewById(R.id.text_movie_grid);
-//        textView.setText(fetchPopularMovies());
-
+        gridView = (GridView) rootView.findViewById(R.id.movie_grid);
+        gridView.setAdapter(movieDataAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                MovieData movieData = (MovieData) movieDataAdapter.getItem(i);
+                Log.e("armiii", "MovieGridFragment#onItemClick:76 tapped movie - " + movieData.getMovieName());
+            }
+        });
         return rootView;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        new FetchMoviesTask().execute();
+        new FetchMoviesTask().execute(TOP_RATED_RANKING);
     }
 
-    public class FetchMoviesTask extends AsyncTask<Void, Void, String>{
+    /**
+     * Gets Movies
+     */
+    public class FetchMoviesTask extends AsyncTask<String, Void, List<MovieData>> {
+
+        /**
+         * Used to get results from JSONObject of results
+         */
+        public static final String RESULTS_KEY = "results";
+
+        /**
+         * Used to get titles of JSONObject of movies
+         */
+        public static final String TITLE_KEY = "title";
+
+        /**
+         * Used to get poster URL from JSONObject of movies
+         */
+        public static final String POSTER_PATH_KEY = "poster_path";
 
         @Override
-        protected String doInBackground(Void... voids) {
+        protected List<MovieData> doInBackground(String... type) {
+            String rankingType = type[0];
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String popularMovies = null;
 
             try {
-                Uri.Builder builder = Uri.parse(POPULAR_MOVIES_BASE_URL).buildUpon();
+                Uri.Builder builder = Uri.parse(MOVIES_RANKING_BASE_URL + rankingType).buildUpon();
                 builder.appendQueryParameter(API_KEY, BuildConfig.MOVIE_API_KEY);
                 URL url = new URL(builder.build().toString());
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -99,13 +150,39 @@ public class MovieGridFragment extends Fragment {
                 }
             }
 
-            Log.e("armiii", "FetchMoviesTask#doInBackground:101 movies - "  + popularMovies);
-            return popularMovies;
+            return parseMovieData(popularMovies);
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            textView.setText(s);
+        protected void onPostExecute(List<MovieData> movieDataList) {
+            movieDataAdapter.setMovieDataList(movieDataList);
+            movieDataAdapter.notifyDataSetChanged();
+        }
+
+        /**
+         * Gets movies in the list
+         *
+         * @param jsonString JSON string with information to parse
+         * @return List of movie data
+         */
+        private List<MovieData> parseMovieData(String jsonString) {
+            List<MovieData> movieDataList = new ArrayList<>();
+            try {
+                Log.e("armiii", "FetchMoviesTask#parseMovieData:171 movies - " + jsonString);
+                JSONObject jsonObject = new JSONObject(jsonString);
+                JSONArray movieArray = jsonObject.getJSONArray(RESULTS_KEY);
+
+                for (int i = 0; i < movieArray.length(); i++) {
+                    JSONObject movieInfo = movieArray.getJSONObject(i);
+                    String title = movieInfo.getString(TITLE_KEY);
+                    String url = movieInfo.getString(POSTER_PATH_KEY);
+                    movieDataList.add(new MovieData(title, url));
+                }
+            } catch (JSONException e) {
+                Log.e(getClass().toString(), "parseMovieData: could not parse movie data", e);
+            }
+
+            return movieDataList;
         }
     }
 }

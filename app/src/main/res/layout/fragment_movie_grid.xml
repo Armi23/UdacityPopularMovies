@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     tools:context="com.armi.popularmovies.MovieGridFragment">
 
-    <!--<GridView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:id="@+id/movie_grid"/>-->
-    <TextView
+    <GridView
+        android:id="@+id/movie_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/text_movie_grid"/>
+        android:columnWidth="100dp"
+        android:horizontalSpacing="10dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp" />
 
 </FrameLayout>
