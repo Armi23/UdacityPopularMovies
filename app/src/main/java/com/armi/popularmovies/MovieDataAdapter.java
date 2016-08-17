@@ -54,7 +54,7 @@ public class MovieDataAdapter extends BaseAdapter {
             view = LayoutInflater.from(context).inflate(R.layout.grid_item, viewGroup, false);
         }
         ImageView movieArtImageView = (ImageView) view.findViewById(R.id.movie_art);
-        Picasso.with(context).load(BASE_MOVIE_API_URL + DEFAULT_IMAGE_SIZE + movieDataList.get(i).getMovieImageUrl()).into(movieArtImageView);
+        Picasso.with(context).load(BASE_MOVIE_API_URL + DEFAULT_IMAGE_SIZE + movieDataList.get(i).getPosterUrl()).into(movieArtImageView);
         return view;
     }
 

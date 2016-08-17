@@ -1,5 +1,6 @@
 package com.armi.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,7 +23,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -37,7 +41,6 @@ public class MovieGridFragment extends Fragment {
      * URL addition needed to get popular movies
      */
     public static final String POPULAR_MOVIES_RANKING = "/movie/popular";
-
 
     /**
      * URL addition needed to get top rated movies
@@ -74,7 +77,9 @@ public class MovieGridFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 MovieData movieData = (MovieData) movieDataAdapter.getItem(i);
-                Log.e("armiii", "MovieGridFragment#onItemClick:76 tapped movie - " + movieData.getMovieName());
+                Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
+                intent.putExtra(MovieDetailsActivity.MOVIE_DATA_PARCEL_KEY, movieData);
+                startActivity(intent);
             }
         });
         return rootView;
@@ -92,19 +97,40 @@ public class MovieGridFragment extends Fragment {
     public class FetchMoviesTask extends AsyncTask<String, Void, List<MovieData>> {
 
         /**
-         * Used to get results from JSONObject of results
+         * Used to get array of movie data from API response
          */
         public static final String RESULTS_KEY = "results";
 
         /**
-         * Used to get titles of JSONObject of movies
+         * Used to get titles of movie
          */
-        public static final String TITLE_KEY = "title";
+        public static final String TITLE_KEY = "original_title";
 
         /**
-         * Used to get poster URL from JSONObject of movies
+         * Used to get poster URL
          */
         public static final String POSTER_PATH_KEY = "poster_path";
+
+        /**
+         * Used to get movie DI
+         */
+        public static final String ID_KEY = "id";
+
+        /**
+         * Used to get a movie's summary
+         */
+        public static final String SUMMARY_KEY = "overview";
+
+        /**
+         * Used to get the user rating
+         */
+        public static final String USER_RATING_KEY = "vote_average";
+
+        /**
+         * Used to get release date
+         */
+        public static final String RELEASE_DATE_KEY = "release_date";
+
 
         @Override
         protected List<MovieData> doInBackground(String... type) {
@@ -167,8 +193,8 @@ public class MovieGridFragment extends Fragment {
          */
         private List<MovieData> parseMovieData(String jsonString) {
             List<MovieData> movieDataList = new ArrayList<>();
+            DateFormat dateFormatter = MovieDateFormatter.getDateFormatter();
             try {
-                Log.e("armiii", "FetchMoviesTask#parseMovieData:171 movies - " + jsonString);
                 JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray movieArray = jsonObject.getJSONArray(RESULTS_KEY);
 
@@ -176,9 +202,13 @@ public class MovieGridFragment extends Fragment {
                     JSONObject movieInfo = movieArray.getJSONObject(i);
                     String title = movieInfo.getString(TITLE_KEY);
                     String url = movieInfo.getString(POSTER_PATH_KEY);
-                    movieDataList.add(new MovieData(title, url));
+                    String id = movieInfo.getString(ID_KEY);
+                    String summary = movieInfo.getString(SUMMARY_KEY);
+                    double rating = movieInfo.getDouble(USER_RATING_KEY);
+                    Date releaseDate = dateFormatter.parse(movieInfo.getString(RELEASE_DATE_KEY));
+                    movieDataList.add(new MovieData(title, url, id, summary, rating, releaseDate));
                 }
-            } catch (JSONException e) {
+            } catch (JSONException | ParseException e) {
                 Log.e(getClass().toString(), "parseMovieData: could not parse movie data", e);
             }
 
