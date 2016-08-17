@@ -65,5 +65,6 @@ public class MovieDataAdapter extends BaseAdapter {
      */
     public void setMovieDataList(List<MovieData> movieDataList) {
         this.movieDataList = movieDataList;
+        notifyDataSetChanged();
     }
 }

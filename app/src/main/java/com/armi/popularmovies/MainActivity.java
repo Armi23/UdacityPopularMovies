@@ -10,11 +10,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MovieGridFragment fragment = new MovieGridFragment();
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container, fragment, fragment.getClass().toString())
-                .commit();
+        if (savedInstanceState == null) {
+            MovieGridFragment fragment = new MovieGridFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container, fragment, fragment.getClass().toString())
+                    .commit();
+        }
     }
 }

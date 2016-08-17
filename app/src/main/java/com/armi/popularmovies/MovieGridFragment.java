@@ -62,18 +62,16 @@ public class MovieGridFragment extends Fragment {
      */
     private MovieDataAdapter movieDataAdapter;
 
+    /**
+     * Item click listener for adapter
+     */
+    private AdapterView.OnItemClickListener itemClickListener;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         movieDataAdapter = new MovieDataAdapter();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
-        gridView = (GridView) rootView.findViewById(R.id.movie_grid);
-        gridView.setAdapter(movieDataAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        itemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 MovieData movieData = (MovieData) movieDataAdapter.getItem(i);
@@ -81,7 +79,15 @@ public class MovieGridFragment extends Fragment {
                 intent.putExtra(MovieDetailsActivity.MOVIE_DATA_PARCEL_KEY, movieData);
                 startActivity(intent);
             }
-        });
+        };
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
+        gridView = (GridView) rootView.findViewById(R.id.movie_grid);
+        gridView.setAdapter(movieDataAdapter);
+        gridView.setOnItemClickListener(itemClickListener);
         return rootView;
     }
 
@@ -182,7 +188,6 @@ public class MovieGridFragment extends Fragment {
         @Override
         protected void onPostExecute(List<MovieData> movieDataList) {
             movieDataAdapter.setMovieDataList(movieDataList);
-            movieDataAdapter.notifyDataSetChanged();
         }
 
         /**
