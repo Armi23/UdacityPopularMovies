@@ -13,6 +13,16 @@ import java.util.Date;
 public class MovieData implements Parcelable {
 
     /**
+     * TMDB API base URL
+     */
+    public static final String BASE_MOVIE_API_URL = "http://image.tmdb.org/t/p/";
+
+    /**
+     * Default recommended phone size
+     */
+    public static final String DEFAULT_IMAGE_SIZE = "w185";
+
+    /**
      * Name of movie
      */
     private final String title;
@@ -113,6 +123,15 @@ public class MovieData implements Parcelable {
      */
     public String getPosterUrl() {
         return posterUrl;
+    }
+
+    /**
+     * Returns the default image URL for the movie poster
+     *
+     * @return default movie poster URL
+     */
+    public String getDefaultSizePosterUrl() {
+        return BASE_MOVIE_API_URL + DEFAULT_IMAGE_SIZE + getPosterUrl();
     }
 
     /**
