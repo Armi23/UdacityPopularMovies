@@ -1,9 +1,11 @@
 package com.armi.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -94,7 +96,20 @@ public class MovieGridFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        new FetchMoviesTask().execute(TOP_RATED_RANKING);
+        updateMovies();
+    }
+
+    /**
+     * Loads the movies by the rankings saved in SharedPreferences
+     */
+    private void updateMovies() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String rankingType = preferences.getString(getString(R.string.ranking_pref_key), getString(R.string.pref_ranking_popular));
+        if (rankingType.equals(getString(R.string.pref_ranking_popular))) {
+            new FetchMoviesTask().execute(POPULAR_MOVIES_RANKING);
+        } else {
+            new FetchMoviesTask().execute(TOP_RATED_RANKING);
+        }
     }
 
     /**

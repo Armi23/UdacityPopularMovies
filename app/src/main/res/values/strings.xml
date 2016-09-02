@@ -2,4 +2,13 @@
     <string name="app_name">PopularMovies</string>
     <string name="release_date">Released: %s</string>
     <string name="rating">Rating: %s</string>
+
+    <string name="rankings">Sort By</string>
+    <string name="ranking_pref_key" translatable="false">rankings</string>
+    <string name="pref_ranking_label_popular">Most Popular</string>
+    <string name="pref_ranking_label_top">Top Rated</string>
+    <string name="pref_ranking_popular">popular</string>
+    <string name="pref_ranking_top">top</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

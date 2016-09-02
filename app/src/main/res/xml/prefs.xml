@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:defaultValue="@string/pref_ranking_popular"
+        android:entries="@array/pref_rankings_options"
+        android:entryValues="@array/pref_rankings_values"
+        android:key="@string/ranking_pref_key"
+        android:title="@string/rankings" />
+
+</PreferenceScreen>
