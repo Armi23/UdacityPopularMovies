@@ -11,4 +11,8 @@
     <string name="pref_ranking_top">top</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="movie_error_dialog_title">Could not load your movies</string>
+    <string name="movie_error_dialog_message">Your movies could not be loaded right now. Hit OK to try again.</string>
+    <string name="ok_button">OK</string>
 </resources>
