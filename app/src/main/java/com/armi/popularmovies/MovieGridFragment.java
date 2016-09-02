@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +61,11 @@ public class MovieGridFragment extends Fragment {
     private GridView gridView;
 
     /**
+     * Reference to loading bar
+     */
+    private ProgressBar loadingBar;
+
+    /**
      * Adapter that coordinates with grid view to display movies
      */
     private MovieDataAdapter movieDataAdapter;
@@ -90,6 +96,7 @@ public class MovieGridFragment extends Fragment {
         gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(movieDataAdapter);
         gridView.setOnItemClickListener(itemClickListener);
+        loadingBar = (ProgressBar) rootView.findViewById(R.id.loading_bar);
         return rootView;
     }
 
@@ -152,6 +159,10 @@ public class MovieGridFragment extends Fragment {
          */
         public static final String RELEASE_DATE_KEY = "release_date";
 
+        @Override
+        protected void onPreExecute() {
+            loadingBar.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected List<MovieData> doInBackground(String... type) {
@@ -203,6 +214,7 @@ public class MovieGridFragment extends Fragment {
         @Override
         protected void onPostExecute(List<MovieData> movieDataList) {
             movieDataAdapter.setMovieDataList(movieDataList);
+            loadingBar.setVisibility(View.GONE);
         }
 
         /**

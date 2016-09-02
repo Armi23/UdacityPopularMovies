@@ -11,7 +11,15 @@
         android:columnWidth="150dp"
         android:horizontalSpacing="0dp"
         android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:stretchMode="columnWidth"/>
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" />
+
+    <ProgressBar
+        android:id="@+id/loading_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone" />
 
 </FrameLayout>
