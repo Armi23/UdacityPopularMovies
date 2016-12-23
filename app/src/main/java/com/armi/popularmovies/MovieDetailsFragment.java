@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.armi.popularmovies.data.MovieAsyncTaskLoader;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -19,11 +22,13 @@ import java.util.Locale;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MovieDetailsFragment extends Fragment {
+public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<MovieData> {
 
     public MovieDetailsFragment() {
         // Required empty public constructor
     }
+
+    private static final int LOADER_ID = 0;
 
     /**
      * Image view for the movie's art
@@ -51,11 +56,6 @@ public class MovieDetailsFragment extends Fragment {
     private TextView summaryTextView;
 
     /**
-     * Current movie in view
-     */
-    private MovieData currentMovie;
-
-    /**
      * Formatter used for release date on view
      */
     private DateFormat viewDateFormatter;
@@ -77,14 +77,35 @@ public class MovieDetailsFragment extends Fragment {
         voteAverageTextView = (TextView) rootView.findViewById(R.id.movie_vote_average);
         summaryTextView = (TextView) rootView.findViewById(R.id.movie_summary);
 
+        return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public Loader<MovieData> onCreateLoader(int id, Bundle args) {
         Intent intent = getActivity().getIntent();
-        currentMovie = intent.getParcelableExtra(MovieDetailsActivity.MOVIE_DATA_PARCEL_KEY);
+        String movieId = intent.getStringExtra(MovieDetailsActivity.MOVIE_ID_KEY);
+        return new MovieAsyncTaskLoader(getContext(), movieId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<MovieData> loader, MovieData data) {
+        MovieData currentMovie = data;
         Picasso.with(getContext()).load(currentMovie.getDefaultSizePosterUrl()).into(artImageView);
         titleTextView.setText(currentMovie.getTitle());
         releaseDateTextView.setText(String.format(getString(R.string.release_date), viewDateFormatter.format(currentMovie.getReleaseDate())));
         voteAverageTextView.setText(String.format(getString(R.string.rating), String.valueOf(currentMovie.getRating())));
         summaryTextView.setText(currentMovie.getSummary());
-        return rootView;
+
     }
 
+    @Override
+    public void onLoaderReset(Loader<MovieData> loader) {
+
+    }
 }

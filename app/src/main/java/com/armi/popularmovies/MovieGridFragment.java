@@ -19,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
+import com.armi.popularmovies.data.MovieDbHelper;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,7 +89,7 @@ public class MovieGridFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 MovieData movieData = (MovieData) movieDataAdapter.getItem(i);
                 Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
-                intent.putExtra(MovieDetailsActivity.MOVIE_DATA_PARCEL_KEY, movieData);
+                intent.putExtra(MovieDetailsActivity.MOVIE_ID_KEY, movieData.getId());
                 startActivity(intent);
             }
         };
@@ -254,6 +256,8 @@ public class MovieGridFragment extends Fragment {
                 Log.e(getClass().toString(), "parseMovieData: could not parse movie data", e);
             }
 
+            MovieDbHelper movieDbHelper = MovieDbHelper.getHelper(getContext());
+            movieDbHelper.recordMovieDatas(movieDataList);
             return movieDataList;
         }
     }

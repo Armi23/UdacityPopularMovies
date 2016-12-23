@@ -9,9 +9,9 @@ import android.os.Bundle;
 public class MovieDetailsActivity extends AppCompatActivity {
 
     /**
-     * Movie data parcel key
+     * Key to access extra with movie ID
      */
-    public static final String MOVIE_DATA_PARCEL_KEY = "movie_data";
+    public static final String MOVIE_ID_KEY = "movie_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,16 +1,16 @@
 package com.armi.popularmovies;
 
 import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A movie item which the MovieDataAdapter holds
  */
-public class MovieData implements Parcelable {
+public class MovieData {
 
     /**
      * TMDB API base URL
@@ -53,6 +53,16 @@ public class MovieData implements Parcelable {
     private final Date releaseDate;
 
     /**
+     * Urls of trailer of movie
+     */
+    private List<String> trailerUrls = new ArrayList<>();
+
+    /**
+     * User reviews of movie
+     */
+    private List<String> userReview = new ArrayList<>();
+
+    /**
      * Constructor
      *
      * @param title       name of movie
@@ -86,26 +96,6 @@ public class MovieData implements Parcelable {
         rating = in.readDouble();
         releaseDate = MovieDateFormatter.getDateFormatter().parse(in.readString());
     }
-
-    /**
-     * Creator needed to make MovieData Parcelable
-     */
-    public static final Creator<MovieData> CREATOR = new Creator<MovieData>() {
-        @Override
-        public MovieData createFromParcel(Parcel in) {
-            try {
-                return new MovieData(in);
-            } catch (ParseException e) {
-                Log.e(getClass().toString(), "Could not parse Parsel", e);
-                return null;
-            }
-        }
-
-        @Override
-        public MovieData[] newArray(int size) {
-            return new MovieData[size];
-        }
-    };
 
     /**
      * Getter for movie name
@@ -170,19 +160,40 @@ public class MovieData implements Parcelable {
         return releaseDate;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    /**
+     * Getter for trailer URLs
+     *
+     * @retur list of trailer URLs
+     */
+    public List<String> getTrailerUrls() {
+        return trailerUrls;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(getTitle());
-        parcel.writeString(getPosterUrl());
-        parcel.writeString(getId());
-        parcel.writeString(getSummary());
-        parcel.writeDouble(getRating());
-        parcel.writeString(MovieDateFormatter.getDateFormatter().format(getReleaseDate()));
+    /**
+     * Setter for list of trailer URLs
+     *
+     * @param trailerUrls list of trailer URLs
+     */
+    public void setTrailerUrls(List<String> trailerUrls) {
+        this.trailerUrls = trailerUrls;
+    }
+
+    /**
+     * Getter for list of user reviews
+     *
+     * @return list of user reviews
+     */
+    public List<String> getUserReview() {
+        return userReview;
+    }
+
+    /**
+     * Setter for list of user reviews
+     *
+     * @param userReview list of user reviews
+     */
+    public void setUserReview(List<String> userReview) {
+        this.userReview = userReview;
     }
 
     @Override
