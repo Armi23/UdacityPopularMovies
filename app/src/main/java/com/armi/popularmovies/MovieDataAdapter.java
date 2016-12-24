@@ -1,60 +1,59 @@
 package com.armi.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
+import com.armi.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Adapter that handles the interactions between displaying movies and updating movies we have
  */
-public class MovieDataAdapter extends BaseAdapter {
+public class MovieDataAdapter extends CursorAdapter {
 
     /**
-     * Data of movies that can be displayed
+     * Constructor
      */
-    private List<MovieData> movieDataList = new ArrayList<>();
-
-    @Override
-    public int getCount() {
-        return movieDataList.size();
+    public MovieDataAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public Object getItem(int i) {
-        return movieDataList.get(i);
+    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+        return LayoutInflater.from(context).inflate(R.layout.grid_item, viewGroup, false);
     }
 
     @Override
-    public long getItemId(int i) {
-        return 0;
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        Context context = viewGroup.getContext();
-        if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.grid_item, viewGroup, false);
+    public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        if (viewHolder == null) {
+            viewHolder = new ViewHolder();
+            viewHolder.movieArtImageView = (ImageView) view.findViewById(R.id.movie_art);
+            view.setTag(viewHolder);
         }
-        ImageView movieArtImageView = (ImageView) view.findViewById(R.id.movie_art);
-        Picasso.with(context).load(movieDataList.get(i).getDefaultSizePosterUrl()).into(movieArtImageView);
-        return view;
+        String url = MovieData.BASE_MOVIE_API_URL + MovieData.DEFAULT_IMAGE_SIZE + cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER));
+        viewHolder.movieId = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry._ID));
+        Picasso.with(context).load(url).into(viewHolder.movieArtImageView);
     }
 
     /**
-     * Updates movies shown to user
-     *
-     * @param movieDataList movies shown to user
+     * ViewHolder for movie data grid adapter views
      */
-    public void setMovieDataList(List<MovieData> movieDataList) {
-        this.movieDataList = movieDataList;
-        notifyDataSetChanged();
+    static class ViewHolder {
+
+        /**
+         * Movie cover art image holder
+         */
+        ImageView movieArtImageView;
+
+        /**
+         * Holds ID of movie being displayed
+         */
+        String movieId;
     }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Manages db for movie information
  */
-public class MovieDbHelper extends SQLiteOpenHelper{
+public class MovieDbHelper extends SQLiteOpenHelper {
 
     /**
      * File name for db
@@ -97,7 +97,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
             contentValues.put(MovieContract.MovieEntry.COLUMN_REVIEWS, listToString(movieData.getUserReview(), DB_STORAGE_DELIMITER));
             contentValues.put(MovieContract.MovieEntry.COLUMN_TRAILER_URLS, listToString(movieData.getTrailerUrls(), DB_STORAGE_DELIMITER));
 
-            sqLiteDatabase.replace(MovieContract.MovieEntry.TABLE_NAME, null,contentValues);
+            sqLiteDatabase.replace(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
         }
 
     }
@@ -115,6 +115,18 @@ public class MovieDbHelper extends SQLiteOpenHelper{
     }
 
     /**
+     * Gets a cursor to the database that has all the ids requested
+     *
+     * @param ids ids requested
+     * @return cursor to database with all those entries
+     */
+    public Cursor getMovieDatasCursor(List<String> ids) {
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        String selection = "_id IN (" + listToString(ids, DB_QUERY_DELIMITER) + ")";
+        return sqLiteDatabase.query(MovieContract.MovieEntry.TABLE_NAME, null, selection, null, null, null, null);
+    }
+
+    /**
      * Gets a list of movie data for provided ids
      *
      * @param ids ID of movie
@@ -122,9 +134,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
      */
     public List<MovieData> getMovieDatas(List<String> ids) {
         List<MovieData> movieDatas = new ArrayList<>();
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        String selection = "_id IN (" + listToString(ids, DB_QUERY_DELIMITER) + ")";
-        Cursor cursor = sqLiteDatabase.query(MovieContract.MovieEntry.TABLE_NAME, null, selection, null, null, null, null);
+        Cursor cursor = getMovieDatasCursor(ids);
         while (cursor.moveToNext()) {
             String id = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry._ID));
             String title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
@@ -157,7 +167,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
     /**
      * Takes a list of strings and turns it into one string to be stored in DB
      *
-     * @param strings list of strings
+     * @param strings   list of strings
      * @param delimiter string used to separate information in db friendly string
      * @return a DB friendly string
      */
@@ -179,7 +189,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
     /**
      * Takes db friendly string and returns list of strings which were the values in the db friendly string
      *
-     * @param string input string
+     * @param string    input string
      * @param delimiter string used to separate information in db friendly string
      * @return List of strings
      */

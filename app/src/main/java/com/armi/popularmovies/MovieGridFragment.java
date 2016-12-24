@@ -3,6 +3,7 @@ package com.armi.popularmovies;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -83,13 +84,13 @@ public class MovieGridFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        movieDataAdapter = new MovieDataAdapter();
+        movieDataAdapter = new MovieDataAdapter(getContext(), null, 0);
         itemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MovieData movieData = (MovieData) movieDataAdapter.getItem(i);
+                MovieDataAdapter.ViewHolder viewHolder = (MovieDataAdapter.ViewHolder) view.getTag();
                 Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
-                intent.putExtra(MovieDetailsActivity.MOVIE_ID_KEY, movieData.getId());
+                intent.putExtra(MovieDetailsActivity.MOVIE_ID_KEY, viewHolder.movieId);
                 startActivity(intent);
             }
         };
@@ -127,7 +128,7 @@ public class MovieGridFragment extends Fragment {
     /**
      * Gets Movies
      */
-    public class FetchMoviesTask extends AsyncTask<String, Void, List<MovieData>> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Cursor> {
 
         /**
          * Used to get array of movie data from API response
@@ -170,7 +171,7 @@ public class MovieGridFragment extends Fragment {
         }
 
         @Override
-        protected List<MovieData> doInBackground(String... type) {
+        protected Cursor doInBackground(String... type) {
             String rankingType = type[0];
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -217,11 +218,11 @@ public class MovieGridFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<MovieData> movieDataList) {
-            if (movieDataList.isEmpty()) {
+        protected void onPostExecute(Cursor cursor) {
+            if (cursor == null) {
                 showMovieLoadingErrorDialog();
             }
-            movieDataAdapter.setMovieDataList(movieDataList);
+            movieDataAdapter.swapCursor(cursor);
             loadingBar.setVisibility(View.GONE);
         }
 
@@ -231,10 +232,11 @@ public class MovieGridFragment extends Fragment {
          * @param jsonString JSON string with information to parse
          * @return List of movie data
          */
-        private List<MovieData> parseMovieData(String jsonString) {
+        private Cursor parseMovieData(String jsonString) {
             List<MovieData> movieDataList = new ArrayList<>();
-            if(TextUtils.isEmpty(jsonString)) {
-                return movieDataList;
+            List<String> idList = new ArrayList<>();
+            if (TextUtils.isEmpty(jsonString)) {
+                return null;
             }
 
             DateFormat dateFormatter = MovieDateFormatter.getDateFormatter();
@@ -251,6 +253,7 @@ public class MovieGridFragment extends Fragment {
                     double rating = movieInfo.getDouble(USER_RATING_KEY);
                     Date releaseDate = dateFormatter.parse(movieInfo.getString(RELEASE_DATE_KEY));
                     movieDataList.add(new MovieData(title, url, id, summary, rating, releaseDate));
+                    idList.add(id);
                 }
             } catch (JSONException | ParseException e) {
                 Log.e(getClass().toString(), "parseMovieData: could not parse movie data", e);
@@ -258,7 +261,8 @@ public class MovieGridFragment extends Fragment {
 
             MovieDbHelper movieDbHelper = MovieDbHelper.getHelper(getContext());
             movieDbHelper.recordMovieDatas(movieDataList);
-            return movieDataList;
+
+            return movieDbHelper.getMovieDatasCursor(idList);
         }
     }
 

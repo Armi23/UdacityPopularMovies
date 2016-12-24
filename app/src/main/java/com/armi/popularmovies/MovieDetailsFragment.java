@@ -28,6 +28,9 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         // Required empty public constructor
     }
 
+    /**
+     * ID used for movie loader
+     */
     private static final int LOADER_ID = 0;
 
     /**
@@ -94,8 +97,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public void onLoadFinished(Loader<MovieData> loader, MovieData data) {
-        MovieData currentMovie = data;
+    public void onLoadFinished(Loader<MovieData> loader, MovieData currentMovie) {
         Picasso.with(getContext()).load(currentMovie.getDefaultSizePosterUrl()).into(artImageView);
         titleTextView.setText(currentMovie.getTitle());
         releaseDateTextView.setText(String.format(getString(R.string.release_date), viewDateFormatter.format(currentMovie.getReleaseDate())));
