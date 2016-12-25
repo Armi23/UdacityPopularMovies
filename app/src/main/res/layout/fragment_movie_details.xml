@@ -1,57 +1,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.percent.PercentRelativeLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/movie_details_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context="com.armi.popularmovies.MovieDetailsFragment">
+        android:layout_height="wrap_content" />
 
-        <ImageView
-            android:id="@+id/movie_art"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:scaleType="fitCenter"
-            app:layout_heightPercent="50%"
-            app:layout_marginBottomPercent="2%"
-            app:layout_marginEndPercent="5%"
-            app:layout_widthPercent="50%" />
-
-        <TextView
-            android:id="@+id/movie_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/movie_art"
-            android:layout_toRightOf="@id/movie_art"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/movie_release_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/movie_title"
-            android:layout_toEndOf="@id/movie_art"
-            android:layout_toRightOf="@id/movie_art" />
-
-        <TextView
-            android:id="@+id/movie_vote_average"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/movie_release_date"
-            android:layout_toEndOf="@id/movie_art"
-            android:layout_toRightOf="@id/movie_art" />
-
-        <TextView
-            android:id="@+id/movie_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/movie_art" />
-
-
-    </android.support.percent.PercentRelativeLayout>
 </ScrollView>

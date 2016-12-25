@@ -34,21 +34,23 @@ public class MovieAsyncTaskLoader extends AsyncTaskLoader<MovieData> {
 
     @Override
     public MovieData loadInBackground() {
-        return movieDbHelper.getMovieData(movieId);
+        MovieData movieData = movieDbHelper.getMovieData(movieId);
+        movieData.setTrailerUrls(MovieDataApiClient.fetchMovieTrailers(movieData.getId()));
+        movieData.setUserReview(MovieDataApiClient.fetchUserReviews(movieData.getId()));
+
+        cachedMovieData = movieData;
+        return cachedMovieData;
     }
 
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        if (cachedMovieData == null) {
-            cachedMovieData = loadInBackground();
+        if (cachedMovieData != null) {
+            deliverResult(cachedMovieData);
+            return;
         }
 
-        if (cachedMovieData.getTrailerUrls() == null || cachedMovieData.getUserReview() == null) {
-            cachedMovieData.setTrailerUrls(MovieDataApiClient.fetchMovieTrailers(cachedMovieData.getId()));
-            cachedMovieData.setUserReview(MovieDataApiClient.fetchUserReviews(cachedMovieData.getId()));
-        }
-
-        deliverResult(cachedMovieData);
+        forceLoad();
     }
+
 }

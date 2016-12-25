@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.armi.popularmovies.MovieData;
@@ -30,11 +31,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      * First version of the database supported by app
      */
     public static final int INITIAL_DATABASE_VERSION = 1;
-
-    /**
-     * String used to split a string from the db into items of a list
-     */
-    private static final String DB_STORAGE_DELIMITER = "|";
 
     /**
      * String used to separate items in a query
@@ -94,8 +90,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             contentValues.put(MovieContract.MovieEntry.COLUMN_SUMMARY, movieData.getSummary());
             contentValues.put(MovieContract.MovieEntry.COLUMN_RATING, movieData.getRating());
             contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, MovieDateFormatter.getDateFormatter().format(movieData.getReleaseDate()));
-            contentValues.put(MovieContract.MovieEntry.COLUMN_REVIEWS, listToString(movieData.getUserReview(), DB_STORAGE_DELIMITER));
-            contentValues.put(MovieContract.MovieEntry.COLUMN_TRAILER_URLS, listToString(movieData.getTrailerUrls(), DB_STORAGE_DELIMITER));
 
             sqLiteDatabase.replace(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
         }
@@ -149,14 +143,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 releaseDate = new Date();
                 Log.e(getClass().toString(), "MovieDbHelper#getMovieDates: could not parse release date for " + id, e);
             }
-            String reviewsString = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_REVIEWS));
-            List<String> userReviews = stringToList(reviewsString, DB_STORAGE_DELIMITER);
-            String trailerUrlsString = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TRAILER_URLS));
-            List<String> trailerUrls = stringToList(trailerUrlsString, DB_STORAGE_DELIMITER);
 
             MovieData movieData = new MovieData(title, posterUrl, id, summary, rating, releaseDate);
-            movieData.setUserReview(userReviews);
-            movieData.setTrailerUrls(trailerUrls);
             movieDatas.add(movieData);
         }
 
@@ -194,6 +182,9 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      * @return List of strings
      */
     private List<String> stringToList(String string, String delimiter) {
+        if (TextUtils.isEmpty(string)) {
+            return new ArrayList<>();
+        }
         return Arrays.asList(string.split(delimiter));
     }
 }

@@ -2,6 +2,8 @@ package com.armi.popularmovies;
 
 import android.os.Parcel;
 
+import com.armi.popularmovies.data.Review;
+import com.armi.popularmovies.data.Trailer;
 import com.armi.popularmovies.network.MovieDataApiClient;
 
 import java.text.ParseException;
@@ -45,14 +47,14 @@ public class MovieData {
     private final Date releaseDate;
 
     /**
-     * Urls of trailer of movie
+     * List of Trailers
      */
-    private List<String> trailerUrls = new ArrayList<>();
+    private List<Trailer> trailerUrls = new ArrayList<>();
 
     /**
-     * User reviews of movie
+     * List of Reviews
      */
-    private List<String> userReview = new ArrayList<>();
+    private List<Review> userReview = new ArrayList<>();
 
     /**
      * Constructor
@@ -152,39 +154,19 @@ public class MovieData {
         return releaseDate;
     }
 
-    /**
-     * Getter for trailer URLs
-     *
-     * @retur list of trailer URLs
-     */
-    public List<String> getTrailerUrls() {
+    public List<Trailer> getTrailerUrls() {
         return trailerUrls;
     }
 
-    /**
-     * Setter for list of trailer URLs
-     *
-     * @param trailerUrls list of trailer URLs
-     */
-    public void setTrailerUrls(List<String> trailerUrls) {
+    public void setTrailerUrls(List<Trailer> trailerUrls) {
         this.trailerUrls = trailerUrls;
     }
 
-    /**
-     * Getter for list of user reviews
-     *
-     * @return list of user reviews
-     */
-    public List<String> getUserReview() {
+    public List<Review> getUserReview() {
         return userReview;
     }
 
-    /**
-     * Setter for list of user reviews
-     *
-     * @param userReview list of user reviews
-     */
-    public void setUserReview(List<String> userReview) {
+    public void setUserReview(List<Review> userReview) {
         this.userReview = userReview;
     }
 

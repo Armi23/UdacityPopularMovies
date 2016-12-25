@@ -63,16 +63,6 @@ public class MovieContract {
         public static final String COLUMN_RELEASE_DATE = "releaseDate";
 
         /**
-         * Trails of movie
-         */
-        public static final String COLUMN_TRAILER_URLS = "trailerUrls";
-
-        /**
-         * Reviews of movie
-         */
-        public static final String COLUMN_REVIEWS = "reviews";
-
-        /**
          * Command used to create table
          */
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
@@ -81,9 +71,7 @@ public class MovieContract {
                 MovieEntry.COLUMN_POSTER + " TEXT NOT NULL," +
                 MovieEntry.COLUMN_SUMMARY + " TEXT NOT NULL," +
                 MovieEntry.COLUMN_RATING + " REAL NOT NULL," +
-                MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
-                MovieEntry.COLUMN_TRAILER_URLS + " TEXT NOT NULL," +
-                MovieEntry.COLUMN_REVIEWS + " TEXT NOT NULL" +
+                MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL" +
                 " );";
     }
 }
