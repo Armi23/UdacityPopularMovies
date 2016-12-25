@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.armi.popularmovies.MovieData;
+import com.armi.popularmovies.network.MovieDataApiClient;
 
 /**
  * AsyncTaskLoader to get movie information from database
@@ -41,6 +42,11 @@ public class MovieAsyncTaskLoader extends AsyncTaskLoader<MovieData> {
         super.onStartLoading();
         if (cachedMovieData == null) {
             cachedMovieData = loadInBackground();
+        }
+
+        if (cachedMovieData.getTrailerUrls() == null || cachedMovieData.getUserReview() == null) {
+            cachedMovieData.setTrailerUrls(MovieDataApiClient.fetchMovieTrailers(cachedMovieData.getId()));
+            cachedMovieData.setUserReview(MovieDataApiClient.fetchUserReviews(cachedMovieData.getId()));
         }
 
         deliverResult(cachedMovieData);

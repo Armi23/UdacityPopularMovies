@@ -2,6 +2,8 @@ package com.armi.popularmovies;
 
 import android.os.Parcel;
 
+import com.armi.popularmovies.network.MovieDataApiClient;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,16 +13,6 @@ import java.util.List;
  * A movie item which the MovieDataAdapter holds
  */
 public class MovieData {
-
-    /**
-     * TMDB API base URL
-     */
-    public static final String BASE_MOVIE_API_URL = "http://image.tmdb.org/t/p/";
-
-    /**
-     * Default recommended phone size
-     */
-    public static final String DEFAULT_IMAGE_SIZE = "w185";
 
     /**
      * Name of movie
@@ -121,7 +113,7 @@ public class MovieData {
      * @return default movie poster URL
      */
     public String getDefaultSizePosterUrl() {
-        return BASE_MOVIE_API_URL + DEFAULT_IMAGE_SIZE + getPosterUrl();
+        return MovieDataApiClient.getDefaultSizePosterUrl(getPosterUrl());
     }
 
     /**

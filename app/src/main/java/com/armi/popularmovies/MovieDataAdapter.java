@@ -9,6 +9,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
 import com.armi.popularmovies.data.MovieContract;
+import com.armi.popularmovies.network.MovieDataApiClient;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -36,7 +37,7 @@ public class MovieDataAdapter extends CursorAdapter {
             viewHolder.movieArtImageView = (ImageView) view.findViewById(R.id.movie_art);
             view.setTag(viewHolder);
         }
-        String url = MovieData.BASE_MOVIE_API_URL + MovieData.DEFAULT_IMAGE_SIZE + cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER));
+        String url = MovieDataApiClient.getDefaultSizePosterUrl(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER)));
         viewHolder.movieId = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry._ID));
         Picasso.with(context).load(url).into(viewHolder.movieArtImageView);
     }
