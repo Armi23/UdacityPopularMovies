@@ -1,6 +1,10 @@
 package com.armi.popularmovies;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,10 +13,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -38,7 +45,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
     /**
      * Boolean tracking if trailer list should be shown
      */
-    private boolean isShowingTrailers = true;
+    private boolean isShowingTrailers = false;
 
     /**
      * Current movie being shown
@@ -62,39 +69,94 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
      */
     public MovieDetailAdapter(Context context) {
         this.context = context;
-        viewDateFormatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        viewDateFormatter = new SimpleDateFormat("yyyy", Locale.getDefault());
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.e("armiii", "MovieDetailAdapter#onCreateViewHolder:70 creating views");
         if (viewType == HEADER_TYPE) {
-            View headerView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_detail_header, parent, false);
+            View headerView = LayoutInflater.from(context).inflate(R.layout.movie_detail_header, parent, false);
             return new HeaderViewHolder(headerView);
+        } else if (isShowingTrailers) {
+            return new TrailerViewHolder(LayoutInflater.from(context).inflate(R.layout.movie_detail_trailer, parent, false));
+        } else {
+            return new ReviewViewHolder(LayoutInflater.from(context).inflate(R.layout.movie_detail_review, parent, false));
         }
-        return new TrailerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_detail_trailer, parent,false));
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Log.e("armiii", "MovieDetailAdapter#onBindViewHolder:80 binding views");
         if (getItemViewType(position) == HEADER_TYPE) {
             if (currentMovie == null) {
                 return;
             }
-            Log.e("armiii", "MovieDetailAdapter#onBindViewHolder:82 binding head");
-            HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
-            Picasso.with(context).load(currentMovie.getDefaultSizePosterUrl()).into(headerViewHolder.artImageView);
+            final HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
             headerViewHolder.titleTextView.setText(currentMovie.getTitle());
+            Picasso.with(context).load(currentMovie.getDefaultSizePosterUrl()).into(headerViewHolder.artImageView, new Callback.EmptyCallback() {
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    Bitmap bitmap = ((BitmapDrawable) headerViewHolder.artImageView.getDrawable()).getBitmap();
+                    Palette palette = Palette.from(bitmap).generate();
+                    Palette.Swatch vibrant = palette.getDarkVibrantSwatch();
+                    int backgroundColor;
+                    int titleTextColor;
+                    int bodyTextColor;
+
+                    if (vibrant != null) {
+                        backgroundColor = vibrant.getRgb();
+                        titleTextColor = vibrant.getTitleTextColor();
+                        bodyTextColor = vibrant.getBodyTextColor();
+                    } else {
+                        List<Palette.Swatch> swatches = palette.getSwatches();
+
+                        if (swatches.size() == 0) {
+                            Log.e(getClass().toString(), "Could not get swatch");
+                            backgroundColor = Color.BLACK;
+                            titleTextColor = Color.WHITE;
+                            bodyTextColor = Color.WHITE;
+                        } else {
+                            Palette.Swatch swatch = swatches.get(0);
+                            backgroundColor = swatch.getRgb();
+                            titleTextColor = swatch.getTitleTextColor();
+                            bodyTextColor = swatch.getBodyTextColor();
+                        }
+                    }
+
+                    headerViewHolder.rootView.setBackgroundColor(backgroundColor);
+                    headerViewHolder.titleTextView.setTextColor(titleTextColor);
+                    headerViewHolder.releaseDateTextView.setTextColor(bodyTextColor);
+                    headerViewHolder.voteAverageTextView.setTextColor(bodyTextColor);
+                    headerViewHolder.summaryTextView.setTextColor(bodyTextColor);
+                    headerViewHolder.trailersTextView.setTextColor(bodyTextColor);
+                    headerViewHolder.trailersTextView.getBackground().setAlpha(128);
+                    headerViewHolder.reviewsTextView.setTextColor(bodyTextColor);
+                    headerViewHolder.reviewsTextView.getBackground().setAlpha(128);
+
+                }
+            });
             headerViewHolder.releaseDateTextView.setText(String.format(context.getString(R.string.release_date), viewDateFormatter.format(currentMovie.getReleaseDate())));
             headerViewHolder.voteAverageTextView.setText(String.format(context.getString(R.string.rating), String.valueOf(currentMovie.getRating())));
             headerViewHolder.summaryTextView.setText(currentMovie.getSummary());
+            headerViewHolder.trailersTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    swapListType(true);
+                }
+            });
+
+            headerViewHolder.reviewsTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    swapListType(false);
+                }
+            });
         } else if (isShowingTrailers) {
             TrailerViewHolder trailerViewHolder = (TrailerViewHolder) holder;
             trailerViewHolder.titleTextView.setText(currentMovie.getTrailerUrls().get(position - 1).getName());
         } else {
-            TrailerViewHolder trailerViewHolder = (TrailerViewHolder) holder;
-            trailerViewHolder.titleTextView.setText(currentMovie.getUserReview().get(position - 1).getContent());
+            ReviewViewHolder reviewViewHolder = (ReviewViewHolder) holder;
+            reviewViewHolder.titleTextView.setText(currentMovie.getUserReview().get(position - 1).getContent());
         }
     }
 
@@ -139,7 +201,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
      */
     private void swapListType(boolean showTrailers) {
         isShowingTrailers = showTrailers;
-        notifyItemRangeChanged(1, 5);
+        notifyItemRangeChanged(1, getItemCount());
         notifyDataSetChanged();
     }
 
@@ -174,24 +236,39 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
         public TextView summaryTextView;
 
         /**
+         * Text view for trailer option of list
+         */
+        public TextView trailersTextView;
+
+        /**
+         * Text view for reviews option of list
+         */
+        public TextView reviewsTextView;
+
+        public View rootView;
+
+        /**
          * Constructor
          *
          * @param rootView root view to be populated
          */
         public HeaderViewHolder(View rootView) {
             super(rootView);
+            this.rootView = rootView;
             artImageView = (ImageView) rootView.findViewById(R.id.movie_art);
             titleTextView = (TextView) rootView.findViewById(R.id.movie_title);
             releaseDateTextView = (TextView) rootView.findViewById(R.id.movie_release_date);
             voteAverageTextView = (TextView) rootView.findViewById(R.id.movie_vote_average);
             summaryTextView = (TextView) rootView.findViewById(R.id.movie_summary);
+            trailersTextView = (TextView) rootView.findViewById(R.id.trailer_button);
+            reviewsTextView = (TextView) rootView.findViewById(R.id.review_button);
         }
     }
 
     /**
      * Holds views for trailer objects
      */
-    private class TrailerViewHolder extends RecyclerView.ViewHolder{
+    private class TrailerViewHolder extends RecyclerView.ViewHolder {
 
         /**
          * Text view for title
@@ -206,6 +283,42 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
         public TrailerViewHolder(View itemView) {
             super(itemView);
             titleTextView = (TextView) itemView.findViewById(R.id.title);
+        }
+    }
+
+    /**
+     * Holds view for Review objects
+     */
+    private class ReviewViewHolder extends RecyclerView.ViewHolder {
+
+        /**
+         * Text view for title
+         */
+        TextView titleTextView;
+
+        /**
+         * Constructor
+         *
+         * @param itemView view of item
+         */
+        public ReviewViewHolder(View itemView) {
+            super(itemView);
+            titleTextView = (TextView) itemView.findViewById(R.id.title);
+        }
+
+    }
+
+    private final class PalleteTransformation implements Transformation {
+
+        @Override
+        public Bitmap transform(Bitmap source) {
+
+            return source;
+        }
+
+        @Override
+        public String key() {
+            return "";
         }
     }
 }

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">PopularMovies</string>
-    <string name="release_date">Released: %s</string>
+    <string name="release_date">%s</string>
     <string name="rating">Rating: %s</string>
 
     <string name="rankings">Sort By</string>
@@ -15,4 +15,7 @@
     <string name="movie_error_dialog_title">Could not load your movies</string>
     <string name="movie_error_dialog_message">Your movies could not be loaded right now. Hit OK to try again.</string>
     <string name="ok_button">OK</string>
+
+    <string name="trailer_button">Trailers</string>
+    <string name="review_button">Reviews</string>
 </resources>

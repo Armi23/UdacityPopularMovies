@@ -80,7 +80,7 @@ public class MovieDataApiClient {
     /**
      * Default recommended phone size
      */
-    public static final String DEFAULT_IMAGE_SIZE = "w185";
+    public static final String DEFAULT_IMAGE_SIZE = "w500";
 
     /**
      * Used to get array of movie data from API response
@@ -264,7 +264,6 @@ public class MovieDataApiClient {
      */
     private static List<Trailer> parseMovieTrailers(String jsonString) {
         try {
-            Log.e("armiii", "MovieDataApiClient#parseMovieTrailers:280 json string - " + jsonString);
             JSONObject jsonObject = new JSONObject(jsonString);
             JSONArray trailerArray = jsonObject.getJSONArray(RESULTS_KEY);
             Trailer[] trailerList = getGson().fromJson(trailerArray.toString(), Trailer[].class);

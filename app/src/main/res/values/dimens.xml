@@ -7,4 +7,5 @@
     <dimen name="grid_column_width">150dp</dimen>
     <dimen name="grid_horizontal_spacing">0dp</dimen>
     <dimen name="grid_vertical_spacing">10dp</dimen>
+    <dimen name="list_horizontal_margin">10dp</dimen>
 </resources>
