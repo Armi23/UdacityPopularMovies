@@ -135,7 +135,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             String summary = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY));
             double rating = cursor.getDouble(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING));
             String releaseDateString = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE));
-
             MovieData movieData = new MovieData(title, posterUrl, id, summary, rating, releaseDateString);
             movieDatas.add(movieData);
         }

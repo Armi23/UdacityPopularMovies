@@ -1,9 +1,11 @@
 package com.armi.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,9 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.armi.popularmovies.data.Review;
+import com.armi.popularmovies.data.Trailer;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,9 +48,14 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
     private static final int REVIEW_ITEM_TYPE = 2;
 
     /**
+     * Used to launch Youtube
+     */
+    private static final String YOUTUBE_LINK = "http://www.youtube.com/watch?v=";
+
+    /**
      * Boolean tracking if trailer list should be shown
      */
-    private boolean isShowingTrailers = false;
+    private boolean isShowingTrailers = true;
 
     /**
      * Current movie being shown
@@ -139,7 +147,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
             });
             try {
                 Date date = MovieDateFormatter.getDateFormatter().parse(currentMovie.getReleaseDate());
-                headerViewHolder.releaseDateTextView.setText(String.format(context.getString(R.string.release_date), date));
+                headerViewHolder.releaseDateTextView.setText(String.format(context.getString(R.string.release_date), viewDateFormatter.format(date)));
             } catch (ParseException e) {
                 Log.e(getClass().toString(), "Could not parse date - " + currentMovie.getReleaseDate());
             }
@@ -160,10 +168,19 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
             });
         } else if (isShowingTrailers) {
             TrailerViewHolder trailerViewHolder = (TrailerViewHolder) holder;
-            trailerViewHolder.titleTextView.setText(currentMovie.getTrailerUrls().get(position - 1).getName());
+            final Trailer trailer = currentMovie.getTrailerUrls().get(position - 1);
+            trailerViewHolder.titleTextView.setText(trailer.getName());
+            trailerViewHolder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    launchYoutube(trailer.getKey());
+                }
+            });
         } else {
             ReviewViewHolder reviewViewHolder = (ReviewViewHolder) holder;
-            reviewViewHolder.titleTextView.setText(currentMovie.getUserReview().get(position - 1).getContent());
+            Review review = currentMovie.getUserReview().get(position - 1);
+            reviewViewHolder.authorTextView.setText(String.format(context.getString(R.string.review_author_byline), review.getAuthor()));
+            reviewViewHolder.reviewTextView.setText(review.getContent());
         }
     }
 
@@ -211,6 +228,16 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
         notifyItemRangeChanged(1, getItemCount());
         notifyDataSetChanged();
     }
+
+    /**
+     * Launches Youtube to given key page
+     *
+     * @param key key page to open
+     */
+    private void launchYoutube(String key) {
+        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_LINK + key)));
+    }
+
 
     /**
      * Makes a view holder for the header
@@ -278,6 +305,11 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
     private class TrailerViewHolder extends RecyclerView.ViewHolder {
 
         /**
+         * Root view of item
+         */
+        View rootView;
+
+        /**
          * Text view for title
          */
         TextView titleTextView;
@@ -289,6 +321,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
          */
         public TrailerViewHolder(View itemView) {
             super(itemView);
+            rootView = itemView;
             titleTextView = (TextView) itemView.findViewById(R.id.title);
         }
     }
@@ -299,9 +332,15 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
     private class ReviewViewHolder extends RecyclerView.ViewHolder {
 
         /**
+         * Text view for author
+         */
+        TextView authorTextView;
+
+
+        /**
          * Text view for title
          */
-        TextView titleTextView;
+        TextView reviewTextView;
 
         /**
          * Constructor
@@ -310,22 +349,9 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
          */
         public ReviewViewHolder(View itemView) {
             super(itemView);
-            titleTextView = (TextView) itemView.findViewById(R.id.title);
+            authorTextView = (TextView) itemView.findViewById(R.id.author);
+            reviewTextView = (TextView) itemView.findViewById(R.id.review);
         }
 
-    }
-
-    private final class PalleteTransformation implements Transformation {
-
-        @Override
-        public Bitmap transform(Bitmap source) {
-
-            return source;
-        }
-
-        @Override
-        public String key() {
-            return "";
-        }
     }
 }

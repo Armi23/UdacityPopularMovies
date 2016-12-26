@@ -18,4 +18,6 @@
 
     <string name="trailer_button">Trailers</string>
     <string name="review_button">Reviews</string>
+
+    <string name="review_author_byline">Comment by: %s</string>
 </resources>
