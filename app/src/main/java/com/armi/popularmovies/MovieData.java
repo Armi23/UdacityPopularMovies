@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A movie item which the MovieDataAdapter holds
+ * A movie item which the MovieGridAdapter holds
  */
 public class MovieData {
 
@@ -51,6 +51,11 @@ public class MovieData {
      * List of Reviews
      */
     private List<Review> userReview = new ArrayList<>();
+
+    /**
+     * Boolean tracking if movie is a favorite
+     */
+    private boolean isFavorite;
 
     /**
      * Constructor
@@ -149,6 +154,14 @@ public class MovieData {
 
     public void setUserReview(List<Review> userReview) {
         this.userReview = userReview;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 
     @Override

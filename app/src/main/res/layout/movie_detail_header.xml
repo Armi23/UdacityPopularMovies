@@ -50,6 +50,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <Button
+                android:id="@+id/add_to_favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
     </LinearLayout>
@@ -75,8 +79,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/background"
-            android:paddingStart="10dp"
             android:paddingEnd="10dp"
+            android:paddingStart="10dp"
             android:text="@string/trailer_button" />
 
         <TextView
@@ -85,8 +89,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/background"
-            android:paddingStart="10dp"
             android:paddingEnd="10dp"
+            android:paddingStart="10dp"
             android:text="@string/review_button" />
     </LinearLayout>
 

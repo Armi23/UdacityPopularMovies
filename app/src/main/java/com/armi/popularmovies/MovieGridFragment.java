@@ -34,7 +34,7 @@ public class MovieGridFragment extends Fragment {
     /**
      * Adapter that coordinates with grid view to display movies
      */
-    private MovieDataAdapter movieDataAdapter;
+    private MovieGridAdapter movieGridAdapter;
 
     /**
      * Item click listener for adapter
@@ -44,11 +44,11 @@ public class MovieGridFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        movieDataAdapter = new MovieDataAdapter(getContext(), null, 0);
+        movieGridAdapter = new MovieGridAdapter(getContext(), null, 0);
         itemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MovieDataAdapter.ViewHolder viewHolder = (MovieDataAdapter.ViewHolder) view.getTag();
+                MovieGridAdapter.ViewHolder viewHolder = (MovieGridAdapter.ViewHolder) view.getTag();
                 Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
                 intent.putExtra(MovieDetailsActivity.MOVIE_ID_KEY, viewHolder.movieId);
                 startActivity(intent);
@@ -60,7 +60,7 @@ public class MovieGridFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         gridView = (GridView) rootView.findViewById(R.id.movie_grid);
-        gridView.setAdapter(movieDataAdapter);
+        gridView.setAdapter(movieGridAdapter);
         gridView.setOnItemClickListener(itemClickListener);
         loadingBar = (ProgressBar) rootView.findViewById(R.id.loading_bar);
         return rootView;
@@ -106,7 +106,7 @@ public class MovieGridFragment extends Fragment {
             if (cursor == null) {
                 showMovieLoadingErrorDialog();
             }
-            movieDataAdapter.swapCursor(cursor);
+            movieGridAdapter.swapCursor(cursor);
             loadingBar.setVisibility(View.GONE);
         }
 

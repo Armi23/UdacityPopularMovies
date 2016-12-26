@@ -15,12 +15,12 @@ import com.squareup.picasso.Picasso;
 /**
  * Adapter that handles the interactions between displaying movies and updating movies we have
  */
-public class MovieDataAdapter extends CursorAdapter {
+public class MovieGridAdapter extends CursorAdapter {
 
     /**
      * Constructor
      */
-    public MovieDataAdapter(Context context, Cursor c, int flags) {
+    public MovieGridAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 

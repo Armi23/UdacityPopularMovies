@@ -13,6 +13,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
      */
     public static final String MOVIE_ID_KEY = "movie_id";
 
+    /**
+     * Used by shared prefs to save favorites
+     */
+    public static final String FAVORITE_SET_KEY = "favorites";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

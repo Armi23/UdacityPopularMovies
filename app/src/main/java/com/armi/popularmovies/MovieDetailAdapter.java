@@ -2,16 +2,19 @@ package com.armi.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,8 +27,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Adapter that controls what's shown in the Movie Detail screen
@@ -73,12 +78,18 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
     private Context context;
 
     /**
+     * Shared prefs
+     */
+    private SharedPreferences sharedPreferences;
+
+    /**
      * Constructor
      *
      * @param context context
      */
     public MovieDetailAdapter(Context context) {
         this.context = context;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         viewDateFormatter = new SimpleDateFormat("yyyy", Locale.getDefault());
     }
 
@@ -152,6 +163,22 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
                 Log.e(getClass().toString(), "Could not parse date - " + currentMovie.getReleaseDate());
             }
             headerViewHolder.voteAverageTextView.setText(String.format(context.getString(R.string.rating), String.valueOf(currentMovie.getRating())));
+            headerViewHolder.addToFavoritesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    currentMovie.setFavorite(!currentMovie.isFavorite());
+                    Set<String> favorites = sharedPreferences.getStringSet(MovieDetailsActivity.FAVORITE_SET_KEY, new HashSet<String>());
+                    Set<String> newFavorites = new HashSet<>(favorites);
+                    if (currentMovie.isFavorite()) {
+                        newFavorites.add(currentMovie.getId());
+                    } else {
+                        newFavorites.remove(currentMovie.getId());
+                    }
+                    sharedPreferences.edit().putStringSet(MovieDetailsActivity.FAVORITE_SET_KEY, newFavorites).apply();
+                    updateAddToFavoritesButton(headerViewHolder.addToFavoritesButton);
+                }
+            });
+            updateAddToFavoritesButton(headerViewHolder.addToFavoritesButton);
             headerViewHolder.summaryTextView.setText(currentMovie.getSummary());
             headerViewHolder.trailersTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -238,6 +265,18 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_LINK + key)));
     }
 
+    /**
+     * Updates the UI of the add to favorites button
+     *
+     * @param button add to favorites button
+     */
+    private void updateAddToFavoritesButton(Button button) {
+        if (currentMovie.isFavorite()) {
+            button.setText(context.getString(R.string.remove_from_favorites));
+        } else {
+            button.setText(context.getString(R.string.add_to_favorites));
+        }
+    }
 
     /**
      * Makes a view holder for the header
@@ -265,6 +304,11 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
         public TextView voteAverageTextView;
 
         /**
+         * Button used to add to favorites
+         */
+        public Button addToFavoritesButton;
+
+        /**
          * Text view for movie's summary
          */
         public TextView summaryTextView;
@@ -279,6 +323,9 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
          */
         public TextView reviewsTextView;
 
+        /**
+         * Root view
+         */
         public View rootView;
 
         /**
@@ -293,6 +340,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
             titleTextView = (TextView) rootView.findViewById(R.id.movie_title);
             releaseDateTextView = (TextView) rootView.findViewById(R.id.movie_release_date);
             voteAverageTextView = (TextView) rootView.findViewById(R.id.movie_vote_average);
+            addToFavoritesButton = (Button) rootView.findViewById(R.id.add_to_favorites);
             summaryTextView = (TextView) rootView.findViewById(R.id.movie_summary);
             trailersTextView = (TextView) rootView.findViewById(R.id.trailer_button);
             reviewsTextView = (TextView) rootView.findViewById(R.id.review_button);
