@@ -6,15 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.armi.popularmovies.MovieData;
-import com.armi.popularmovies.MovieDateFormatter;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -80,20 +76,23 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      *
      * @param movieDatas list of MovieData
      */
-    public void recordMovieDatas(List<MovieData> movieDatas) {
+    public List<String> recordMovieDatas(List<MovieData> movieDatas) {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        List<String> idList = new ArrayList<>();
         for (MovieData movieData : movieDatas) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(MovieContract.MovieEntry._ID, movieData.getId());
             contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movieData.getTitle());
-            contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER, movieData.getPosterUrl());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER, movieData.getPosterPath());
             contentValues.put(MovieContract.MovieEntry.COLUMN_SUMMARY, movieData.getSummary());
             contentValues.put(MovieContract.MovieEntry.COLUMN_RATING, movieData.getRating());
-            contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, MovieDateFormatter.getDateFormatter().format(movieData.getReleaseDate()));
+            contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movieData.getReleaseDate());
 
             sqLiteDatabase.replace(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
+            idList.add(movieData.getId());
         }
 
+        return idList;
     }
 
     /**
@@ -136,15 +135,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             String summary = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY));
             double rating = cursor.getDouble(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING));
             String releaseDateString = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE));
-            Date releaseDate;
-            try {
-                releaseDate = MovieDateFormatter.getDateFormatter().parse(releaseDateString);
-            } catch (ParseException e) {
-                releaseDate = new Date();
-                Log.e(getClass().toString(), "MovieDbHelper#getMovieDates: could not parse release date for " + id, e);
-            }
 
-            MovieData movieData = new MovieData(title, posterUrl, id, summary, rating, releaseDate);
+            MovieData movieData = new MovieData(title, posterUrl, id, summary, rating, releaseDateString);
             movieDatas.add(movieData);
         }
 

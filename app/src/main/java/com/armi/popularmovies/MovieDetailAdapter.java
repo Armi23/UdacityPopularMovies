@@ -18,7 +18,9 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -135,7 +137,12 @@ public class MovieDetailAdapter extends RecyclerView.Adapter {
 
                 }
             });
-            headerViewHolder.releaseDateTextView.setText(String.format(context.getString(R.string.release_date), viewDateFormatter.format(currentMovie.getReleaseDate())));
+            try {
+                Date date = MovieDateFormatter.getDateFormatter().parse(currentMovie.getReleaseDate());
+                headerViewHolder.releaseDateTextView.setText(String.format(context.getString(R.string.release_date), date));
+            } catch (ParseException e) {
+                Log.e(getClass().toString(), "Could not parse date - " + currentMovie.getReleaseDate());
+            }
             headerViewHolder.voteAverageTextView.setText(String.format(context.getString(R.string.rating), String.valueOf(currentMovie.getRating())));
             headerViewHolder.summaryTextView.setText(currentMovie.getSummary());
             headerViewHolder.trailersTextView.setOnClickListener(new View.OnClickListener() {

@@ -1,14 +1,10 @@
 package com.armi.popularmovies;
 
-import android.os.Parcel;
-
 import com.armi.popularmovies.data.Review;
 import com.armi.popularmovies.data.Trailer;
 import com.armi.popularmovies.network.MovieDataApiClient;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,12 +15,12 @@ public class MovieData {
     /**
      * Name of movie
      */
-    private final String title;
+    private final String original_title;
 
     /**
      * Poster URL of movie
      */
-    private final String posterUrl;
+    private final String poster_path;
 
     /**
      * ID of movie
@@ -34,17 +30,17 @@ public class MovieData {
     /**
      * Summary of movie
      */
-    private final String summary;
+    private final String overview;
 
     /**
-     * User rating of movie
+     * User vote_average of movie
      */
-    private final double rating;
+    private final double vote_average;
 
     /**
      * Release date of movie
      */
-    private final Date releaseDate;
+    private final String release_date;
 
     /**
      * List of Trailers
@@ -60,35 +56,20 @@ public class MovieData {
      * Constructor
      *
      * @param title       name of movie
-     * @param posterUrl   URL of movie image
+     * @param posterPath   URL of movie image
      * @param id          ID of movie
-     * @param summary     summary of movie
-     * @param rating      user rating of movie
+     * @param summary     overview of movie
+     * @param rating      user vote_average of movie
      * @param releaseDate release date of movie
      */
-    public MovieData(String title, String posterUrl, String id, String summary,
-                     double rating, Date releaseDate) {
-        this.title = title;
-        this.posterUrl = posterUrl;
+    public MovieData(String title, String posterPath, String id, String summary,
+                     double rating, String releaseDate) {
+        this.original_title = title;
+        this.poster_path = posterPath;
         this.id = id;
-        this.summary = summary;
-        this.rating = rating;
-        this.releaseDate = releaseDate;
-    }
-
-    /**
-     * Constructor made from Parcel
-     *
-     * @param in input Parcel
-     * @throws ParseException thrown when date cannot be formatted
-     */
-    protected MovieData(Parcel in) throws ParseException {
-        title = in.readString();
-        posterUrl = in.readString();
-        id = in.readString();
-        summary = in.readString();
-        rating = in.readDouble();
-        releaseDate = MovieDateFormatter.getDateFormatter().parse(in.readString());
+        this.overview = summary;
+        this.vote_average = rating;
+        this.release_date = releaseDate;
     }
 
     /**
@@ -97,7 +78,7 @@ public class MovieData {
      * @return movie name
      */
     public String getTitle() {
-        return title;
+        return original_title;
     }
 
     /**
@@ -105,8 +86,8 @@ public class MovieData {
      *
      * @return movie image URL
      */
-    public String getPosterUrl() {
-        return posterUrl;
+    public String getPosterPath() {
+        return poster_path;
     }
 
     /**
@@ -115,7 +96,7 @@ public class MovieData {
      * @return default movie poster URL
      */
     public String getDefaultSizePosterUrl() {
-        return MovieDataApiClient.getDefaultSizePosterUrl(getPosterUrl());
+        return MovieDataApiClient.getDefaultSizePosterUrl(getPosterPath());
     }
 
     /**
@@ -130,19 +111,19 @@ public class MovieData {
     /**
      * Summary of movie
      *
-     * @return summary of movie
+     * @return overview of movie
      */
     public String getSummary() {
-        return summary;
+        return overview;
     }
 
     /**
-     * User rating of movie
+     * User vote_average of movie
      *
-     * @return user rating of movie
+     * @return user vote_average of movie
      */
     public double getRating() {
-        return rating;
+        return vote_average;
     }
 
     /**
@@ -150,8 +131,8 @@ public class MovieData {
      *
      * @return release date of movie
      */
-    public Date getReleaseDate() {
-        return releaseDate;
+    public String getReleaseDate() {
+        return release_date;
     }
 
     public List<Trailer> getTrailerUrls() {
@@ -173,12 +154,12 @@ public class MovieData {
     @Override
     public String toString() {
         return "MovieData{" +
-                "title='" + title + '\'' +
-                ", posterUrl='" + posterUrl + '\'' +
+                "original_title='" + original_title + '\'' +
+                ", poster_path='" + poster_path + '\'' +
                 ", id='" + id + '\'' +
-                ", summary='" + summary + '\'' +
-                ", rating=" + rating +
-                ", releaseDate=" + releaseDate +
+                ", overview='" + overview + '\'' +
+                ", vote_average=" + vote_average +
+                ", release_date=" + release_date +
                 '}';
     }
 }

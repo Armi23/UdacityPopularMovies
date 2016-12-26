@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.armi.popularmovies.BuildConfig;
 import com.armi.popularmovies.MovieData;
-import com.armi.popularmovies.MovieDateFormatter;
 import com.armi.popularmovies.data.MovieDbHelper;
 import com.armi.popularmovies.data.Review;
 import com.armi.popularmovies.data.Trailer;
@@ -21,11 +20,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -86,36 +82,6 @@ public class MovieDataApiClient {
      * Used to get array of movie data from API response
      */
     public static final String RESULTS_KEY = "results";
-
-    /**
-     * Used to get titles of movie
-     */
-    public static final String TITLE_KEY = "original_title";
-
-    /**
-     * Used to get poster URL
-     */
-    public static final String POSTER_PATH_KEY = "poster_path";
-
-    /**
-     * Used to get movie DI
-     */
-    public static final String ID_KEY = "id";
-
-    /**
-     * Used to get a movie's summary
-     */
-    public static final String SUMMARY_KEY = "overview";
-
-    /**
-     * Used to get the user rating
-     */
-    public static final String USER_RATING_KEY = "vote_average";
-
-    /**
-     * Used to get release date
-     */
-    public static final String RELEASE_DATE_KEY = "release_date";
 
     /**
      * Gson used for parsing API responses
@@ -225,34 +191,21 @@ public class MovieDataApiClient {
      */
     private static Cursor parseMovieData(String jsonString, Context context) {
         List<MovieData> movieDataList = new ArrayList<>();
-        List<String> idList = new ArrayList<>();
         if (TextUtils.isEmpty(jsonString)) {
             return null;
         }
 
-        DateFormat dateFormatter = MovieDateFormatter.getDateFormatter();
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             JSONArray movieArray = jsonObject.getJSONArray(RESULTS_KEY);
-
-            for (int i = 0; i < movieArray.length(); i++) {
-                JSONObject movieInfo = movieArray.getJSONObject(i);
-                String title = movieInfo.getString(TITLE_KEY);
-                String url = movieInfo.getString(POSTER_PATH_KEY);
-                String id = movieInfo.getString(ID_KEY);
-                String summary = movieInfo.getString(SUMMARY_KEY);
-                double rating = movieInfo.getDouble(USER_RATING_KEY);
-                Date releaseDate = dateFormatter.parse(movieInfo.getString(RELEASE_DATE_KEY));
-                movieDataList.add(new MovieData(title, url, id, summary, rating, releaseDate));
-                idList.add(id);
-            }
-        } catch (JSONException | ParseException e) {
+            MovieData[] movieList = getGson().fromJson(movieArray.toString(), MovieData[].class);
+            movieDataList = Arrays.asList(movieList);
+        } catch (JSONException e) {
             Log.e(LOG_TAG, "parseMovieData: could not parse movie data", e);
         }
 
         MovieDbHelper movieDbHelper = MovieDbHelper.getHelper(context);
-        movieDbHelper.recordMovieDatas(movieDataList);
-
+        List<String> idList = movieDbHelper.recordMovieDatas(movieDataList);
         return movieDbHelper.getMovieDatasCursor(idList);
     }
 
