@@ -17,10 +17,21 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
+import com.armi.popularmovies.data.MovieDbHelper;
 import com.armi.popularmovies.network.MovieDataApiClient;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class MovieGridFragment extends Fragment {
+
+    /**
+     * Favorite movie type
+     */
+    public static final String FAVORITE_MOVIES = "favorites";
+
     /**
      * GridView to display movies
      */
@@ -41,10 +52,16 @@ public class MovieGridFragment extends Fragment {
      */
     private AdapterView.OnItemClickListener itemClickListener;
 
+    /**
+     * Reference to shared preferences
+     */
+    private SharedPreferences sharedPreferences;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         movieGridAdapter = new MovieGridAdapter(getContext(), null, 0);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
         itemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -80,8 +97,10 @@ public class MovieGridFragment extends Fragment {
         String rankingType = preferences.getString(getString(R.string.ranking_pref_key), getString(R.string.pref_ranking_popular));
         if (rankingType.equals(getString(R.string.pref_ranking_popular))) {
             new FetchMoviesTask().execute(MovieDataApiClient.POPULAR_MOVIES_RANKING);
-        } else {
+        } else if (rankingType.equals(getString(R.string.pref_ranking_top))) {
             new FetchMoviesTask().execute(MovieDataApiClient.TOP_RATED_RANKING);
+        } else {
+            new FetchMoviesTask().execute(FAVORITE_MOVIES);
         }
     }
 
@@ -98,6 +117,10 @@ public class MovieGridFragment extends Fragment {
         @Override
         protected Cursor doInBackground(String... type) {
             String rankingType = type[0];
+            if (rankingType.equals(FAVORITE_MOVIES)) {
+                Set<String> idList = sharedPreferences.getStringSet(MovieDetailsActivity.FAVORITE_SET_KEY, new HashSet<String>());
+                return MovieDbHelper.getHelper(getContext()).getMovieDatasCursor(new ArrayList<>(idList));
+            }
             return MovieDataApiClient.fetchMovieData(rankingType, getContext());
         }
 
@@ -109,7 +132,6 @@ public class MovieGridFragment extends Fragment {
             movieGridAdapter.swapCursor(cursor);
             loadingBar.setVisibility(View.GONE);
         }
-
     }
 
     /**

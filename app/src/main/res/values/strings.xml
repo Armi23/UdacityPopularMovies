@@ -7,8 +7,10 @@
     <string name="ranking_pref_key" translatable="false">rankings</string>
     <string name="pref_ranking_label_popular">Most Popular</string>
     <string name="pref_ranking_label_top">Highest Rated</string>
+    <string name="pref_ranking_label_fav">Favorites</string>
     <string name="pref_ranking_popular">popular</string>
     <string name="pref_ranking_top">top</string>
+    <string name="pref_ranking_fav">fav</string>
 
     <string name="action_settings">Settings</string>
 
